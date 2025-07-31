@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Player Answer Time Display
 // @namespace    http://tampermonkey.net/
-// @version      1.12
+// @version      1.13
 // @description  Makes you able to see how quickly people answered
 // @author       Zolhungaj
 // @match        https://animemusicquiz.com/*
@@ -15,7 +15,6 @@
 
 if (typeof Listener === "undefined") return
 
-const version = "1.12"
 let ignoredPlayerIds = []
 
 const ignorePlayersRegular = (players) => {
@@ -62,12 +61,15 @@ new Listener("nexus map rejoin", () => {
 }).bindListener()
 
 new Listener("player answered", (data) => {
-    data.filter(id => !ignoredPlayerIds.includes(id)).forEach(id => {
-        let player = quiz.players?.[id]
-        if (player) { //prevent errors from hidden players
-            player.answer = amqAnswerTimesUtility.playerTimes[id] + "ms"
+    for (const item of data) {
+        for (const id of item.gamePlayerIds) {
+            if (ignoredPlayerIds.includes(id)) continue
+            const player = quiz.players?.[id]
+            if (player) { //prevent errors from hidden players
+                player.answer = amqAnswerTimesUtility.playerTimes[id] + "ms"
+            }
         }
-    })
+    }
 }).bindListener()
 
 new Listener("answer results", (data) => {
@@ -105,7 +107,7 @@ quiz._playerAnswerListner = new Listener("player answers", (data) => {
 AMQ_addScriptData({
     name: "Player Answer Time Display",
     author: "Zolhungaj",
-    version: version,
+    version: GM_info.script.version,
     link: "https://github.com/amq-script-project/AMQ-Scripts/raw/master/gameplay/amqPlayerAnswerTimeDisplay.user.js",
     description: `
         <p>Makes you able to see how quickly people answered</p>
