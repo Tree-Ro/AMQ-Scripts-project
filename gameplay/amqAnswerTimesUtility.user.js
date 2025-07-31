@@ -16,7 +16,7 @@ const amqAnswerTimesUtility = new function () {
     new Listener("player answered", (data) => {
         for (const item of data) {
             for (const id of item.gamePlayerIds) {
-                this.playerTimes[id] = item.answerTime * 1000
+                this.playerTimes[id] = Math.floor(item.answerTime * 1000)
             }
         }
     }).bindListener()
